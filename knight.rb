@@ -17,9 +17,8 @@ class Knight < SteppingPiece
   end
 
 
-  def to_pic
-    "N"
+  def code
+    "\u265E"
   end
-
 
 end

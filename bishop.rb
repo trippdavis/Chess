@@ -6,7 +6,7 @@ class Bishop < SlidingPiece
     @move_directions = [[1, 1], [1, -1], [-1, -1], [-1, 1]]
   end
 
-  def to_pic
-    "B"
+  def code
+    "\u265D"
   end
 end

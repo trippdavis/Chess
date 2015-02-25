@@ -1,6 +1,7 @@
 require_relative 'require_all_pieces.rb'
 
 require 'byebug'
+require 'colorize'
 
 class Board
   attr_accessor :state
@@ -38,18 +39,16 @@ class Board
     king = pieces_of_color(color).find { |piece| piece.class == King }
     king_pos = king.pos
 
-    @state.flatten.each do |square|
-      if square && square.color != color
-        in_check = true if square.moves.include?(king_pos)
-      end
+    pieces_of_color(other_color(color)).each do |piece|
+      in_check = true if piece.moves.include?(king_pos)
     end
 
     in_check
   end
 
   def checkmate?(color)
-    @state.flatten.compact.none? do |square|
-      square.color == color && square.valid_moves.length > 0
+    pieces_of_color(color).none? do |piece|
+      piece.valid_moves.length > 0
     end
   end
 
@@ -76,20 +75,18 @@ class Board
       end
     end
 
-    board_dup.state.flatten.compact.each do |square|
-      square.board = board_dup
+    board_dup.all_pieces.each do |piece|
+      piece.board = board_dup
     end
 
     board_dup
   end
 
-  private
-
-  def each_piece(&prc)
-    @state.flatten.compact.each do |piece|
-      prc.call(piece)
-    end
+  def all_pieces
+    @state.flatten.compact
   end
+
+  private
 
   def pieces_of_color(color)
     @state.flatten.compact.select do |piece|
@@ -97,21 +94,33 @@ class Board
     end
   end
 
+  def other_color(color)
+    color == :white ? :black : :white
+  end
+
   def to_s
     to_show = ""
+    count = 1
 
     @state.each do |row|
       row.each do |square|
-        to_show << (square.nil? ? nil_display : square.display)
+        background_color = ( count.even? ? :black : :light_black )
+        to_show << (
+          square.nil? ?
+          nil_display.colorize(background: background_color) :
+          square.display.colorize(background: background_color)
+        )
+        count += 1
       end
       to_show << "\n"
+      count += 1
     end
 
     to_show
   end
 
   def nil_display
-    " "
+    "    "
   end
 
   def init_state

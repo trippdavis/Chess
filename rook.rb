@@ -7,7 +7,7 @@ class Rook < SlidingPiece
     @move_directions = [[1, 0], [0, 1], [-1, 0], [0, -1]]
   end
 
-  def to_pic
-    "R"
+  def code
+    "\u265E"
   end
 end

@@ -1,5 +1,6 @@
 class HumanPlayer
   attr_accessor :color
+  attr_reader :name
 
   def initialize(name)
     @name = name

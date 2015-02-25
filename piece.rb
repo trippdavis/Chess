@@ -16,7 +16,8 @@ class Piece
   end
 
   def display
-    to_pic
+    display_color = (@color == :white ? :red : :blue)
+    ' ' + code.encode('utf-8').colorize(display_color) + '  '
   end
 
   def on_board?(position)

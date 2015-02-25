@@ -28,7 +28,7 @@ class Pawn < Piece
     poss_moves
   end
 
-  def to_pic
-    "P"
+  def code
+    "\u265F"
   end
 end

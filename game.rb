@@ -35,6 +35,11 @@ class Game
 
       switch_player
     end
+
+    @board.display
+    puts "#{@current_player.name} is in checkmate."
+    switch_player
+    puts "#{@current_player.name} wins!!"
   end
 
   def get_from_pos

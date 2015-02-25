@@ -17,7 +17,7 @@ class King < SteppingPiece
   end
 
 
-  def to_pic
-    "K"
+  def code
+    "\u265A"
   end
 end

@@ -16,8 +16,8 @@ class Queen < SlidingPiece
     ]
   end
 
-  def to_pic
-    "Q"
+  def code
+    "\u265B"
   end
 
 end
