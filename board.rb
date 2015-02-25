@@ -1,5 +1,7 @@
 require_relative 'require_all_pieces.rb'
 
+require 'byebug'
+
 class Board
   attr_accessor :state
 
@@ -9,6 +11,20 @@ class Board
   end
 
   def move(start_pos, end_pos)
+    piece = self[*start_pos]
+    raise "No piece at start position" if piece.nil?
+    raise "Move not possible" unless piece.moves.include?(end_pos)
+    raise "Can't move into check" unless piece.valid_moves.include?(end_pos)
+    captured_piece = self[*end_pos]
+    captured_piece.pos = nil if captured_piece
+
+    self[*end_pos] = piece
+    piece.pos = end_pos
+    self[*start_pos] = nil
+
+  end
+
+  def move!(start_pos, end_pos)
     piece = self[*start_pos]
     raise "No piece at start position" if piece.nil?
     raise "Move not possible" unless piece.moves.include?(end_pos)
@@ -35,6 +51,14 @@ class Board
     end
 
     in_check
+  end
+
+  def checkmate?(color)
+    @state.flatten.none? do |square|
+      square &&
+      square.color == color &&
+      square.valid_moves.length > 0
+    end
   end
 
   def [](x, y)

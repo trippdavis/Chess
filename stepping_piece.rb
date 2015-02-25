@@ -9,11 +9,13 @@ class SteppingPiece < Piece
   def moves
     possible_moves = []
 
-    MOVE_DIFFS.each do |diff|
+    @move_diffs.each do |diff|
       try = add_move_diff(diff)
 
-      break unless on_board?(try)
-      conflicting_piece = @board[try]
+      next unless on_board?(try)
+      conflicting_piece = @board[*try]
+
+      # debugger
 
       if conflicting_piece.nil? || conflicting_piece.color != color
         possible_moves << try

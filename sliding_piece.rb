@@ -8,13 +8,13 @@ class SlidingPiece < Piece
   def moves
     possible_moves = []
 
-    MOVE_DIRECTIONS.each do |direction|
+    @move_directions.each do |direction|
       (1..7).each do |i|
         diff = direction * i
-        try = add_move_dif(diff)
+        try = add_move_diff(diff)
 
         break unless on_board?(try)
-        conflicting_piece = @board[try]
+        conflicting_piece = @board[*try]
 
         if conflicting_piece.nil?
           possible_moves << try
