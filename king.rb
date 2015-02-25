@@ -16,8 +16,7 @@ class King < SteppingPiece
     ]
   end
 
-
   def code
-    "\u265A"
+    '♚'
   end
 end

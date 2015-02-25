@@ -15,8 +15,6 @@ class SteppingPiece < Piece
       next unless on_board?(try)
       conflicting_piece = @board[*try]
 
-      # debugger
-
       if conflicting_piece.nil? || conflicting_piece.color != color
         possible_moves << try
       end
@@ -24,5 +22,4 @@ class SteppingPiece < Piece
 
     possible_moves
   end
-
 end

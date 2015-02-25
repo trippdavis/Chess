@@ -8,6 +8,6 @@ class Rook < SlidingPiece
   end
 
   def code
-    "\u265E"
+    '♜'
   end
 end

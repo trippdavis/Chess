@@ -1,5 +1,6 @@
 require_relative 'board.rb'
 require_relative 'human_player.rb'
+require_relative 'error_classes.rb'
 
 
 class Game
@@ -15,24 +16,9 @@ class Game
   def play
     puts "It's on! Place your bets now."
 
-
     until won?
       @board.display
-
-      begin
-        start_pos = get_from_pos
-        end_pos = get_to_pos
-        @board.move(start_pos, end_pos)
-      rescue MoveImpossible
-        puts "final position invalid"
-        retry
-      rescue CheckError
-        puts "can't move into check"
-        retry
-      rescue
-        raise
-      end
-
+      make_move
       switch_player
     end
 
@@ -42,18 +28,24 @@ class Game
     puts "#{@current_player.name} wins!!"
   end
 
+  private
+
+  def make_move
+    start_pos = get_from_pos
+    end_pos = get_to_pos
+    @board.move(start_pos, end_pos)
+
+    rescue MoveImpossible, CheckError => e
+      puts e.message
+      retry
+  end
+
   def get_from_pos
     begin
       start_pos = @current_player.pick_from_pos
       check_start_pos(start_pos, @current_player.color)
-    rescue ArgumentError
-      puts "please enter two integers separated by a space"
-      retry
-    rescue OutOfBounds
-      puts "that space is not on the board"
-      retry
-    rescue StartPosError
-      puts "no piece of yours at start position"
+    rescue ArgumentError, OutOfBounds, StartPosError => e
+      puts e.message
       retry
     end
 
@@ -64,18 +56,15 @@ class Game
     begin
       end_pos = @current_player.pick_to_pos
       check_end_pos(end_pos)
-    rescue ArgumentError
-      puts "please enter two integers separated by a space"
-      retry
-    rescue OutOfBounds
-      puts "that space is not on the board"
+    rescue ArgumentError, OutOfBounds => e
+      puts e.message
       retry
     end
 
     end_pos
   end
 
-  def check_start_pos(start_pos, color)
+  def check_start_pos(start_pos, color) # http://stackoverflow.com/questions/3382866/rubys-exception-error-classes
     raise OutOfBounds unless start_pos.all? { |i| (0..7).include?(i) }
     piece = @board[*start_pos]
     raise StartPosError if piece.nil? || piece.color != color
@@ -92,10 +81,7 @@ class Game
   def switch_player
     @current_player = (@current_player == @white ? @black : @white)
   end
-
 end
-
-class StartPosError < RuntimeError; end
 
 if __FILE__ == $PROGRAM_NAME
   T = HumanPlayer.new("Tripp")

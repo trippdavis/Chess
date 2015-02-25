@@ -1,13 +1,11 @@
 require_relative 'require_all_pieces.rb'
-
-require 'byebug'
 require 'colorize'
 
 class Board
-  attr_accessor :state
+  attr_accessor :grid
 
   def initialize
-    @state = Array.new(8) { Array.new(8) }
+    @grid = Array.new(8) { Array.new(8) }
     init_state
   end
 
@@ -17,13 +15,10 @@ class Board
 
     raise MoveImpossible unless piece.moves.include?(end_pos)
     raise CheckError unless piece.valid_moves.include?(end_pos)
-    captured_piece = self[*end_pos]
-    captured_piece.pos = nil if captured_piece
 
     self[*end_pos] = piece
     piece.pos = end_pos
     self[*start_pos] = nil
-
   end
 
   def move!(start_pos, end_pos)
@@ -34,30 +29,27 @@ class Board
   end
 
   def in_check?(color)
-    in_check = false
-
     king = pieces_of_color(color).find { |piece| piece.class == King }
-    king_pos = king.pos
 
     pieces_of_color(other_color(color)).each do |piece|
-      in_check = true if piece.moves.include?(king_pos)
+      return true if piece.moves.include?(king.pos)
     end
 
-    in_check
+    false
   end
 
   def checkmate?(color)
     pieces_of_color(color).none? do |piece|
-      piece.valid_moves.length > 0
+      piece.valid_moves.any?
     end
   end
 
   def [](x, y)
-    @state[x][y]
+    @grid[x][y]
   end
 
   def []=(x, y, resident)
-    @state[x][y] = resident
+    @grid[x][y] = resident
   end
 
   def display
@@ -67,29 +59,28 @@ class Board
   def deep_dup
     board_dup = self.dup
 
-    board_dup.state = @state.dup
-    @state.each_with_index do |row, i|
-      board_dup.state[i] = row.dup
+    board_dup.grid = @grid.dup
+    @grid.each_with_index do |row, i|
+      board_dup.grid[i] = row.dup
       row.each_with_index do |square, j|
-        board_dup[i,j] = square.dup if square
+        if square
+          board_dup[i,j] = square.dup
+          board_dup[i,j].board = board_dup
+        end
       end
-    end
-
-    board_dup.all_pieces.each do |piece|
-      piece.board = board_dup
     end
 
     board_dup
   end
 
   def all_pieces
-    @state.flatten.compact
+    @grid.flatten.compact
   end
 
   private
 
   def pieces_of_color(color)
-    @state.flatten.compact.select do |piece|
+    @grid.flatten.compact.select do |piece|
       piece.color == color
     end
   end
@@ -100,27 +91,18 @@ class Board
 
   def to_s
     to_show = ""
-    count = 1
 
-    @state.each do |row|
-      row.each do |square|
-        background_color = ( count.even? ? :black : :light_black )
-        to_show << (
-          square.nil? ?
-          nil_display.colorize(background: background_color) :
-          square.display.colorize(background: background_color)
-        )
-        count += 1
+    @grid.each_with_index do |row, i|
+      row.each_with_index do |square, j|
+        background_color = ((i + j).odd? ? :black : :light_black)
+        square_str = square.nil? ? '    ' : square.render
+        to_show << (square_str.colorize(background: background_color))
       end
+
       to_show << "\n"
-      count += 1
     end
 
     to_show
-  end
-
-  def nil_display
-    "    "
   end
 
   def init_state
@@ -143,7 +125,3 @@ class Board
     end
   end
 end
-
-class OutOfBounds < RuntimeError; end
-class MoveImpossible < RuntimeError; end
-class CheckError < RuntimeError; end

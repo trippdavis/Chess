@@ -7,6 +7,6 @@ class Bishop < SlidingPiece
   end
 
   def code
-    "\u265D"
+    '♝'
   end
 end

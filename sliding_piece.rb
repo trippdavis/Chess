@@ -9,8 +9,8 @@ class SlidingPiece < Piece
     possible_moves = []
 
     @move_directions.each do |direction|
-      (1..7).each do |i|
-        diff = direction.map{ |el| el * i }
+      (1..7).each do |mult|
+        diff = direction.map{ |el| el * mult }
         try = add_move_diff(diff)
 
         break unless on_board?(try)

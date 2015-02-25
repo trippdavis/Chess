@@ -15,9 +15,9 @@ class Piece
     moves.select { |move| !move_into_check?(move) }
   end
 
-  def display
+  def render
     display_color = (@color == :white ? :red : :blue)
-    ' ' + code.encode('utf-8').colorize(display_color) + '  '
+    ' ' + code.colorize(display_color) + '  '
   end
 
   def on_board?(position)
@@ -36,8 +36,6 @@ class Piece
   end
 
   def inspect
-    p self.class
-    p @pos
-    @color
+    "Type: #{self.class}, Pos: #{@pos}, Color: #{@color}"
   end
 end

@@ -16,9 +16,7 @@ class Knight < SteppingPiece
     ]
   end
 
-
   def code
-    "\u265E"
+    '♞'
   end
-
 end

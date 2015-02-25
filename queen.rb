@@ -17,7 +17,6 @@ class Queen < SlidingPiece
   end
 
   def code
-    "\u265B"
+    '♛'
   end
-
 end
