@@ -1,11 +1,91 @@
 require_relative 'require_all_pieces.rb'
 
 class Board
-  attr_reader :state
+  attr_accessor :state
 
   def initialize
     @state = Array.new(8) { Array.new(8) }
     init_state
+  end
+
+  def move(start_pos, end_pos)
+    piece = self[*start_pos]
+    raise "No piece at start position" if piece.nil?
+    raise "Move not possible" unless piece.moves.include?(end_pos)
+    self[*end_pos] = piece
+    piece.pos = end_pos
+    self[*start_pos] = nil
+  end
+
+  def in_check?(color)
+    in_check = false
+    king_pos = []
+
+    @state.flatten.each do |square|
+      if square.class == King && square.color == color
+        king_pos = square.pos
+        break
+      end
+    end
+
+    @state.flatten.each do |square|
+      if square && square.color != color
+        in_check = true if square.moves.include?(king_pos)
+      end
+    end
+
+    in_check
+  end
+
+  def [](x, y)
+    @state[x][y]
+  end
+
+  def []=(x, y, resident)
+    @state[x][y] = resident
+  end
+
+  def display
+    puts to_s
+  end
+
+  def deep_dup
+    board_dup = self.dup
+
+    board_dup.state = @state.dup
+    @state.each_with_index do |row, i|
+      board_dup.state[i] = row.dup
+      row.each_with_index do |square, j|
+        board_dup[i,j] = square.dup if square
+      end
+    end
+
+    board_dup.state.flatten.each do |square|
+      if square
+        square.board = board_dup
+      end
+    end
+
+    board_dup
+  end
+
+  private
+
+  def to_s
+    to_show = ""
+
+    @state.each do |row|
+      row.each do |square|
+        to_show << (square.nil? ? nil_display : square.display)
+      end
+      to_show << "\n"
+    end
+
+    to_show
+  end
+
+  def nil_display
+    " "
   end
 
   def init_state
@@ -28,34 +108,6 @@ class Board
     end
   end
 
-  def [](x, y)
-    @state[x][y]
-  end
-
-  def []=(x, y, resident)
-    @state[x][y] = resident
-  end
-
-  def display
-    puts to_s
-  end
-
-  def to_s
-    to_show = ""
-
-    @state.each do |row|
-      row.each do |square|
-        to_show << (square.nil? ? nil_display : square.display)
-      end
-      to_show << "\n"
-    end
-
-    to_show
-  end
-
-  def nil_display
-    " "
-  end
 
 end
 
