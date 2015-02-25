@@ -1,3 +1,5 @@
+require 'byebug'
+
 class Piece
   attr_accessor :pos
   attr_writer :board

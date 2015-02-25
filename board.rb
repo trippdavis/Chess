@@ -11,10 +11,11 @@ class Board
   end
 
   def move(start_pos, end_pos)
+    raise OutOfBounds unless start_pos.all? { |i| (0..7).include?(i) }
     piece = self[*start_pos]
-    raise "No piece at start position" if piece.nil?
-    raise "Move not possible" unless piece.moves.include?(end_pos)
-    raise "Can't move into check" unless piece.valid_moves.include?(end_pos)
+
+    raise MoveImpossible unless piece.moves.include?(end_pos)
+    raise CheckError unless piece.valid_moves.include?(end_pos)
     captured_piece = self[*end_pos]
     captured_piece.pos = nil if captured_piece
 
@@ -26,8 +27,6 @@ class Board
 
   def move!(start_pos, end_pos)
     piece = self[*start_pos]
-    raise "No piece at start position" if piece.nil?
-    raise "Move not possible" unless piece.moves.include?(end_pos)
     self[*end_pos] = piece
     piece.pos = end_pos
     self[*start_pos] = nil
@@ -35,14 +34,9 @@ class Board
 
   def in_check?(color)
     in_check = false
-    king_pos = []
 
-    @state.flatten.each do |square|
-      if square.class == King && square.color == color
-        king_pos = square.pos
-        break
-      end
-    end
+    king = pieces_of_color(color).find { |piece| piece.class == King }
+    king_pos = king.pos
 
     @state.flatten.each do |square|
       if square && square.color != color
@@ -54,10 +48,8 @@ class Board
   end
 
   def checkmate?(color)
-    @state.flatten.none? do |square|
-      square &&
-      square.color == color &&
-      square.valid_moves.length > 0
+    @state.flatten.compact.none? do |square|
+      square.color == color && square.valid_moves.length > 0
     end
   end
 
@@ -84,16 +76,26 @@ class Board
       end
     end
 
-    board_dup.state.flatten.each do |square|
-      if square
-        square.board = board_dup
-      end
+    board_dup.state.flatten.compact.each do |square|
+      square.board = board_dup
     end
 
     board_dup
   end
 
   private
+
+  def each_piece(&prc)
+    @state.flatten.compact.each do |piece|
+      prc.call(piece)
+    end
+  end
+
+  def pieces_of_color(color)
+    @state.flatten.compact.select do |piece|
+      piece.color == color
+    end
+  end
 
   def to_s
     to_show = ""
@@ -131,10 +133,8 @@ class Board
       self[6, i] = Pawn.new(self, [6, i], :white)
     end
   end
-
-
 end
 
-if __FILE__ == $PROGRAM_NAME
-  a = Board.new
-end
+class OutOfBounds < RuntimeError; end
+class MoveImpossible < RuntimeError; end
+class CheckError < RuntimeError; end

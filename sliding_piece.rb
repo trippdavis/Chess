@@ -10,7 +10,7 @@ class SlidingPiece < Piece
 
     @move_directions.each do |direction|
       (1..7).each do |i|
-        diff = direction * i
+        diff = direction.map{ |el| el * i }
         try = add_move_diff(diff)
 
         break unless on_board?(try)
@@ -19,7 +19,7 @@ class SlidingPiece < Piece
         if conflicting_piece.nil?
           possible_moves << try
         elsif conflicting_piece.color != color
-          posssible_moves << try
+          possible_moves << try
           break
         else
           break
