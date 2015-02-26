@@ -7,6 +7,8 @@ class Board
   def initialize
     @grid = Array.new(8) { Array.new(8) }
     init_state
+    @white_captured = []
+    @black_captured = []
   end
 
   def move(start_pos, end_pos)
@@ -14,6 +16,13 @@ class Board
 
     raise MoveImpossible unless piece.moves.include?(end_pos)
     raise CheckError unless piece.valid_moves.include?(end_pos)
+
+    unless self[*end_pos].nil?
+      captured = self[*end_pos]
+      captured.color == :white ?
+        @white_captured << captured.code.colorize(:red) :
+        @black_captured << captured.code.colorize(:blue)
+    end
 
     self[*end_pos] = piece
     piece.pos = end_pos
@@ -99,7 +108,10 @@ class Board
         square_str = square.nil? ? '    ' : square.render
         to_show << (square_str.colorize(background: background_color))
       end
-      to_show << " #{8 - i}\n"
+      to_show << " #{8 - i}"
+      to_show << "  #{@white_captured.join(' ')}" if i == 0
+      to_show << "  #{@black_captured.join(' ')}" if i == 7
+      to_show << "\n"
     end
 
     to_show += letters
