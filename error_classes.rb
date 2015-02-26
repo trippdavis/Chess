@@ -27,3 +27,9 @@ class InvalidEntry < RuntimeError
     super(msg)
   end
 end
+
+class GameSaveError < RuntimeError
+  def initialize(msg = "Game saved.")
+    super(msg)
+  end
+end

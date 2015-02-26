@@ -17,6 +17,10 @@ class HumanPlayer
   end
 
   def pos_conversion(pos)
+    if pos[0] =~ /[sql]/
+      return pos[0]
+    end
+
     raise InvalidEntry unless pos[0] =~ /[a-h]/ && pos[1] =~ /[1-8]/
     [8 - pos[1].to_i, pos[0].ord - "a".ord]
   end
