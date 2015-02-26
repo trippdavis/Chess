@@ -22,8 +22,8 @@ class StartPosError < RuntimeError
   end
 end
 
-class ArgumentError
-  def message
-    "Enter two integers separated by a space"
+class InvalidEntry < RuntimeError
+  def initialize(msg = "Enter space as letter followed by number")
+    super(msg)
   end
 end

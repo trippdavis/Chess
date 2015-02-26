@@ -10,7 +10,6 @@ class Board
   end
 
   def move(start_pos, end_pos)
-    raise OutOfBounds unless start_pos.all? { |i| (0..7).include?(i) }
     piece = self[*start_pos]
 
     raise MoveImpossible unless piece.moves.include?(end_pos)
@@ -91,18 +90,23 @@ class Board
 
   def to_s
     to_show = ""
+    to_show += letters
 
     @grid.each_with_index do |row, i|
+      to_show << "#{8 - i} "
       row.each_with_index do |square, j|
         background_color = ((i + j).odd? ? :black : :light_black)
         square_str = square.nil? ? '    ' : square.render
         to_show << (square_str.colorize(background: background_color))
       end
-
-      to_show << "\n"
+      to_show << " #{8 - i}\n"
     end
 
-    to_show
+    to_show += letters
+  end
+
+  def letters
+    "   " + ("a".."h").to_a.join("   ") + "\n"
   end
 
   def init_state

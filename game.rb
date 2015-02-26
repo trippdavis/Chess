@@ -44,7 +44,7 @@ class Game
     begin
       start_pos = @current_player.pick_from_pos
       check_start_pos(start_pos, @current_player.color)
-    rescue ArgumentError, OutOfBounds, StartPosError => e
+    rescue InvalidEntry, StartPosError => e
       puts e.message
       retry
     end
@@ -55,8 +55,7 @@ class Game
   def get_to_pos
     begin
       end_pos = @current_player.pick_to_pos
-      check_end_pos(end_pos)
-    rescue ArgumentError, OutOfBounds => e
+    rescue InvalidEntry => e
       puts e.message
       retry
     end
@@ -64,14 +63,9 @@ class Game
     end_pos
   end
 
-  def check_start_pos(start_pos, color) # http://stackoverflow.com/questions/3382866/rubys-exception-error-classes
-    raise OutOfBounds unless start_pos.all? { |i| (0..7).include?(i) }
+  def check_start_pos(start_pos, color)
     piece = @board[*start_pos]
     raise StartPosError if piece.nil? || piece.color != color
-  end
-
-  def check_end_pos(end_pos)
-    raise OutOfBounds unless end_pos.all? { |i| (0..7).include?(i) }
   end
 
   def won?
